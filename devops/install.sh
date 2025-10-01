@@ -55,18 +55,18 @@ else
 fi
 
 # Check and install PHP
-PHP_VERSION=8.0
+# PHP_VERSION=8.0
 if ! command_exists php; then
-    echo -e "${YELLOW}Installing PHP $PHP_VERSION...${NC}"
+    echo -e "${YELLOW}Installing PHP ...${NC}"
     if [ "$OS_TYPE" = "Mac" ]; then
-        brew install php@$PHP_VERSION
+        brew install php
         echo 'export PATH="/usr/local/opt/php@8.0/bin:$PATH"' >> ~/.zshrc
         source ~/.zshrc
     elif [ "$OS_TYPE" = "Linux" ]; then
         sudo apt-get update
-        sudo apt-get install -y php$PHP_VERSION php$PHP_VERSION-sqlite3
+        sudo apt-get install -y php php-sqlite3
     elif [ "$OS_TYPE" = "Windows" ]; then
-        echo -e "${RED}Please install PHP $PHP_VERSION manually from https://www.php.net/downloads.php and ensure php-sqlite3 is enabled, then rerun this script.${NC}"
+        echo -e "${RED}Please install PHP manually from https://www.php.net/downloads.php and ensure php-sqlite3 is enabled, then rerun this script.${NC}"
         exit 1
     fi
 else
