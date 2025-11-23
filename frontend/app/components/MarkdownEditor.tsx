@@ -82,6 +82,15 @@ export default function MarkdownEditor({
   // Calculate if we're in title mode (first line only)
   const lines = value.split('\n');
   const isTitleMode = lines.length === 1;
+  const titleText = isTitleMode ? value.replace(prefix, '').trim() : lines[0]?.replace(prefix, '').trim() || '';
+  const contentText = lines.slice(1).join('\n');
+  const wordCount = contentText.split(/\s+/).filter(word => word.length > 0).length;
+  const charCount = contentText.length;
+  
+  // Validation states
+  const titleTooShort = titleText.length > 0 && titleText.length < 3;
+  const titleTooLong = titleText.length > 100;
+  const titleValid = titleText.length >= 3 && titleText.length <= 100;
 
   return (
     <div className={`relative ${className}`}>
@@ -126,15 +135,45 @@ export default function MarkdownEditor({
       </div>
       
       {/* Helper text */}
-      <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
-        <span>
-          {isTitleMode 
-            ? 'Press Enter after your title to start writing content'
-            : 'Markdown supported • Use # for headings, ** for bold, * for italic'}
-        </span>
-        <span className="font-mono text-slate-400 dark:text-slate-500">
-          {lines.length} line{lines.length === 1 ? '' : 's'}
-        </span>
+      <div className="mt-2 space-y-1">
+        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+          <span>
+            {isTitleMode 
+              ? 'Press Enter after your title to start writing content'
+              : 'Markdown supported • Use # for headings, ** for bold, * for italic'}
+          </span>
+          <span className="font-mono text-slate-400 dark:text-slate-500">
+            {lines.length} line{lines.length === 1 ? '' : 's'}
+            {!isTitleMode && ` • ${wordCount} words • ${charCount} chars`}
+          </span>
+        </div>
+        
+        {/* Title validation feedback */}
+        {!isTitleMode && titleText && (
+          <div className="flex items-center gap-2 text-xs">
+            <span className={`font-medium ${
+              titleTooShort 
+                ? 'text-yellow-600 dark:text-yellow-500' 
+                : titleTooLong 
+                ? 'text-red-600 dark:text-red-400'
+                : titleValid
+                ? 'text-green-600 dark:text-green-500'
+                : 'text-slate-500 dark:text-slate-400'
+            }`}>
+              Title: {titleText.length}/100 chars
+            </span>
+            {titleTooShort && (
+              <span className="text-yellow-600 dark:text-yellow-500">
+                (Title should be at least 3 characters)
+              </span>
+            )}
+            {titleTooLong && (
+              <span className="text-red-600 dark:text-red-400">
+                (Title is too long)
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
