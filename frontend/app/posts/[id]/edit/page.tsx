@@ -10,7 +10,6 @@ import { parseMarkdown, combineToMarkdown } from '../../../utils/markdown';
 import ThemeToggle from '../../../components/ThemeToggle';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
-import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 interface Post {
   id: string;
