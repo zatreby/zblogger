@@ -10,6 +10,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 import MarkdownEditor from './components/MarkdownEditor';
 import { parseMarkdown } from './utils/markdown';
 import ThemeToggle from './components/ThemeToggle';
+import LoadingSpinner from './components/LoadingSpinner';
 
 interface Post {
   id: string;
@@ -123,11 +124,7 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
-        <div className="text-lg text-slate-600 dark:text-slate-400 font-medium">Loading posts...</div>
-      </div>
-    );
+    return <LoadingSpinner fullScreen text="Loading posts..." />;
   }
 
   if (error) {
