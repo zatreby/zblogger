@@ -11,6 +11,7 @@ import MarkdownEditor from './components/MarkdownEditor';
 import { parseMarkdown } from './utils/markdown';
 import ThemeToggle from './components/ThemeToggle';
 import LoadingSpinner from './components/LoadingSpinner';
+import EmptyState from './components/EmptyState';
 
 interface Post {
   id: string;
@@ -213,15 +214,7 @@ export default function HomePage() {
       {/* Posts Grid */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {posts.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-slate-600 dark:text-slate-400 text-lg mb-4">No posts yet</div>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
-            >
-              Create your first post
-            </button>
-          </div>
+          <EmptyState onAction={() => setShowCreateForm(true)} />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post) => (
