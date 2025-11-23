@@ -9,7 +9,7 @@ import { useKeyboardShortcut } from './hooks/useKeyboardShortcut';
 import { toast } from 'sonner';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import MarkdownEditor from './components/MarkdownEditor';
-import { parseMarkdown } from './utils/markdown';
+import { parseMarkdown, combineToMarkdown } from './utils/markdown';
 import ThemeToggle from './components/ThemeToggle';
 import LoadingSpinner from './components/LoadingSpinner';
 import EmptyState from './components/EmptyState';
@@ -64,6 +64,19 @@ export default function HomePage() {
 
     try {
       setCreating(true);
+      
+      // Optimistic update: add post immediately with temporary ID
+      const optimisticPost: Post = {
+        id: `temp-${Date.now()}`,
+        title,
+        content,
+        created_at: new Date().toISOString(),
+        last_modified: new Date().toISOString(),
+      };
+      setPosts([optimisticPost, ...posts]);
+      setNewPostContent('# ');
+      setShowCreateForm(false);
+      
       const response = await fetch(`${API_URL}/posts`, {
         method: 'POST',
         headers: {
@@ -75,11 +88,14 @@ export default function HomePage() {
       if (!response.ok) throw new Error('Failed to create post');
       
       const data = await response.json();
-      setPosts([data.data, ...posts]);
-      setNewPostContent('# ');
-      setShowCreateForm(false);
+      // Replace optimistic post with real one
+      setPosts(posts => [data.data, ...posts.filter(p => p.id !== optimisticPost.id)]);
       toast.success('Post created successfully');
     } catch (err) {
+      // Rollback optimistic update on error
+      setPosts(posts => posts.filter(p => !p.id.startsWith('temp-')));
+      setShowCreateForm(true);
+      setNewPostContent(combineToMarkdown(title, content));
       toast.error(err instanceof Error ? err.message : 'Failed to create post');
     } finally {
       setCreating(false);
@@ -93,18 +109,30 @@ export default function HomePage() {
   const handleDeleteConfirm = async () => {
     if (!deleteModal) return;
 
+    const postToDelete = posts.find(p => p.id === deleteModal.id);
+    
     try {
       setDeleting(true);
+      
+      // Optimistic update: remove post immediately
+      setPosts(posts.filter(post => post.id !== deleteModal.id));
+      setDeleteModal(null);
+      
       const response = await fetch(`${API_URL}/posts/${deleteModal.id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to delete post');
       
-      setPosts(posts.filter(post => post.id !== deleteModal.id));
       toast.success('Post deleted successfully');
-      setDeleteModal(null);
     } catch (err) {
+      // Rollback optimistic update on error
+      if (postToDelete) {
+        setPosts([...posts, postToDelete].sort((a, b) => 
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ));
+      }
+      setDeleteModal({ id: deleteModal.id, title: deleteModal.title });
       toast.error(err instanceof Error ? err.message : 'Failed to delete post');
     } finally {
       setDeleting(false);
