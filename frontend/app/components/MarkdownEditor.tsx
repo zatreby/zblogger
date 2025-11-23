@@ -87,14 +87,14 @@ export default function MarkdownEditor({
     <div className={`relative ${className}`}>
       {/* Visual indicator for title mode */}
       {isTitleMode && isFocused && (
-        <div className="absolute -top-6 left-0 text-xs text-slate-500 font-medium">
+        <div className="absolute -top-6 left-0 text-xs text-slate-500 dark:text-slate-400 font-medium">
           Type your post title, then press Enter to start writing
         </div>
       )}
       
       <div className="relative">
         {/* Prefix overlay for visual emphasis */}
-        <div className="absolute left-3 top-3 text-2xl font-bold text-accent-600 pointer-events-none select-none">
+        <div className="absolute left-3 top-3 text-2xl font-bold text-accent-600 dark:text-accent-400 pointer-events-none select-none">
           #
         </div>
         
@@ -108,15 +108,15 @@ export default function MarkdownEditor({
           disabled={disabled}
           className={`
             w-full px-3 py-3 pl-12
-            border border-slate-300 rounded-lg
-            focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-accent-500
-            font-mono text-sm text-base-900
-            placeholder-base-400
+            border border-slate-300 dark:border-slate-600 rounded-lg
+            focus:outline-none focus:ring-2 focus:ring-accent-500 dark:focus:ring-accent-400 focus:border-accent-500 dark:focus:border-accent-400
+            font-mono text-sm text-base-900 dark:text-base-100
+            placeholder-base-400 dark:placeholder-base-500
             resize-y min-h-[400px]
-            bg-white
+            bg-white dark:bg-base-800
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all
-            ${isFocused ? 'border-accent-300 shadow-sm' : ''}
+            ${isFocused ? 'border-accent-300 dark:border-accent-600 shadow-sm' : ''}
           `}
           placeholder={isTitleMode ? 'Your post title here...' : 'Continue writing your post...'}
           style={{
@@ -126,13 +126,13 @@ export default function MarkdownEditor({
       </div>
       
       {/* Helper text */}
-      <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
+      <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
         <span>
           {isTitleMode 
             ? 'Press Enter after your title to start writing content'
             : 'Markdown supported • Use # for headings, ** for bold, * for italic'}
         </span>
-        <span className="font-mono text-slate-400">
+        <span className="font-mono text-slate-400 dark:text-slate-500">
           {lines.length} line{lines.length === 1 ? '' : 's'}
         </span>
       </div>

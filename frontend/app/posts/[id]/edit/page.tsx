@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import MarkdownEditor from '../../../components/MarkdownEditor';
 import { parseMarkdown, combineToMarkdown } from '../../../utils/markdown';
+import ThemeToggle from '../../../components/ThemeToggle';
 
 interface Post {
   id: string;
@@ -87,20 +88,20 @@ export default function EditPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="text-lg text-slate-600 font-medium">Loading post...</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="text-lg text-slate-600 dark:text-slate-400 font-medium">Loading post...</div>
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg border border-base-200 shadow-sm p-8 max-w-md">
-          <div className="text-base-900 text-lg font-medium mb-4">{error || 'Post not found'}</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm p-8 max-w-md">
+          <div className="text-base-900 dark:text-base-100 text-lg font-medium mb-4">{error || 'Post not found'}</div>
           <Link 
             href="/"
-            className="inline-block px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 transition-colors font-medium"
+            className="inline-block px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
           >
             Back to Home
           </Link>
@@ -110,28 +111,29 @@ export default function EditPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-50">
+    <div className="min-h-screen bg-base-50 dark:bg-base-900">
       {/* Header */}
-      <header className="bg-white border-b border-base-200">
+      <header className="bg-white dark:bg-base-800 border-b border-base-200 dark:border-base-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <Link
               href={`/posts/${post.id}`}
-              className="text-slate-600 hover:text-slate-900 flex items-center gap-2 font-medium text-sm transition-colors"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 font-medium text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Post
             </Link>
+            <ThemeToggle />
           </div>
         </div>
       </header>
 
       {/* Edit Form */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg border border-base-200 shadow-sm p-6 sm:p-8">
+        <div className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm p-6 sm:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-base-900 mb-2">Edit Post</h1>
-            <p className="text-sm text-slate-600">Edit your title and content in the unified editor below.</p>
+            <h1 className="text-2xl font-semibold text-base-900 dark:text-base-100 mb-2">Edit Post</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Edit your title and content in the unified editor below.</p>
           </div>
           <form onSubmit={handleUpdatePost}>
             <div className="mb-6">
@@ -145,13 +147,13 @@ export default function EditPostPage() {
               <button
                 type="submit"
                 disabled={updating}
-                className="px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 {updating ? 'Updating...' : 'Update Post'}
               </button>
               <Link
                 href={`/posts/${post.id}`}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                className="px-4 py-2 bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
               >
                 Cancel
               </Link>

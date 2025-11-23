@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { toast } from 'sonner';
 import { AlertTriangle, Loader2, ArrowLeft } from 'lucide-react';
+import ThemeToggle from '../../components/ThemeToggle';
 
 interface Post {
   id: string;
@@ -92,20 +93,20 @@ export default function PostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="text-lg text-slate-600 font-medium">Loading post...</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="text-lg text-slate-600 dark:text-slate-400 font-medium">Loading post...</div>
       </div>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg border border-base-200 shadow-sm p-8 max-w-md">
-          <div className="text-base-900 text-lg font-medium mb-4">{error || 'Post not found'}</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm p-8 max-w-md">
+          <div className="text-base-900 dark:text-base-100 text-lg font-medium mb-4">{error || 'Post not found'}</div>
           <Link 
             href="/"
-            className="inline-block px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 transition-colors font-medium"
+            className="inline-block px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
           >
             Back to Home
           </Link>
@@ -115,28 +116,29 @@ export default function PostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-50">
+    <div className="min-h-screen bg-base-50 dark:bg-base-900">
       {/* Header */}
-      <header className="bg-white border-b border-base-200">
+      <header className="bg-white dark:bg-base-800 border-b border-base-200 dark:border-base-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <Link
               href="/"
-              className="text-slate-600 hover:text-slate-900 flex items-center gap-2 font-medium text-sm transition-colors"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center gap-2 font-medium text-sm transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Blog
             </Link>
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
+              <ThemeToggle />
               <Link
                 href={`/posts/${post.id}/edit`}
-                className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                className="px-4 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
               >
                 Edit
               </Link>
               <button
                 onClick={handleDeleteClick}
-                className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                className="px-4 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
               >
                 Delete
               </button>
@@ -147,10 +149,10 @@ export default function PostPage() {
 
       {/* Post Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <article className="bg-white rounded-lg border border-base-200 shadow-sm overflow-hidden">
-          <div className="border-b border-base-200 px-6 sm:px-8 py-8">
-            <h1 className="text-3xl font-semibold text-base-900 mb-4 tracking-tight">{post.title}</h1>
-            <div className="text-sm text-slate-600 space-y-1">
+        <article className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm overflow-hidden">
+          <div className="border-b border-base-200 dark:border-base-700 px-6 sm:px-8 py-8">
+            <h1 className="text-3xl font-semibold text-base-900 dark:text-base-100 mb-4 tracking-tight">{post.title}</h1>
+            <div className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
               <div>Created: {formatDate(post.created_at)}</div>
               {post.last_modified !== post.created_at && (
                 <div>Last modified: {formatDate(post.last_modified)}</div>
@@ -159,28 +161,28 @@ export default function PostPage() {
           </div>
           
           <div className="px-6 sm:px-8 py-8">
-            <div className="prose prose-slate prose-lg max-w-none text-base-800 leading-relaxed">
+            <div className="prose prose-slate dark:prose-invert prose-lg max-w-none text-base-800 dark:text-base-200 leading-relaxed">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {post.content}
               </ReactMarkdown>
             </div>
           </div>
 
-          <div className="bg-base-50 border-t border-base-200 px-6 sm:px-8 py-6">
+          <div className="bg-base-50 dark:bg-base-900 border-t border-base-200 dark:border-base-700 px-6 sm:px-8 py-6">
             <div className="flex justify-between items-center flex-wrap gap-4">
-              <div className="text-xs text-slate-500 font-mono">
-                Post ID: <code className="bg-base-200 px-2 py-1 rounded text-slate-700">{post.id}</code>
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                Post ID: <code className="bg-base-200 dark:bg-base-700 px-2 py-1 rounded text-slate-700 dark:text-slate-300">{post.id}</code>
               </div>
               <div className="flex gap-3">
                 <Link
                   href={`/posts/${post.id}/edit`}
-                  className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                  className="px-4 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
                 >
                   Edit Post
                 </Link>
                 <button
                   onClick={handleDeleteClick}
-                  className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                  className="px-4 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
                 >
                   Delete Post
                 </button>
@@ -193,33 +195,33 @@ export default function PostPage() {
       {/* Delete Confirmation Modal */}
       {post && (
         <Dialog open={showDeleteModal} onClose={handleDeleteCancel} className="relative z-50">
-          <div className="fixed inset-0 bg-base-900/50" aria-hidden="true" />
+          <div className="fixed inset-0 bg-base-900/50 dark:bg-base-950/50" aria-hidden="true" />
           <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-            <DialogPanel className="max-w-lg space-y-4 bg-white rounded-lg border border-base-200 shadow-lg p-6">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-50 rounded-full">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+            <DialogPanel className="max-w-lg space-y-4 bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-lg p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-50 dark:bg-red-900/20 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               
-              <DialogTitle className="text-lg font-semibold text-base-900 text-center">
+              <DialogTitle className="text-lg font-semibold text-base-900 dark:text-base-100 text-center">
                 Delete Post
               </DialogTitle>
               
-              <p className="text-slate-600 text-center text-sm">
-                Are you sure you want to delete <span className="font-medium text-base-900">"{post.title}"</span>? This action cannot be undone.
+              <p className="text-slate-600 dark:text-slate-400 text-center text-sm">
+                Are you sure you want to delete <span className="font-medium text-base-900 dark:text-base-100">"{post.title}"</span>? This action cannot be undone.
               </p>
               
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleDeleteCancel}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  className="flex-1 px-4 py-2 bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteConfirm}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-red-600 dark:bg-red-500 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm flex items-center justify-center gap-2"
                 >
                   {deleting ? (
                     <>

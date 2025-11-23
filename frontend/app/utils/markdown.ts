@@ -3,12 +3,12 @@
  * Title is expected to be on the first line starting with # 
  */
 export function parseMarkdown(markdown: string): { title: string; content: string } {
-  if (!markdown || !markdown.trim()) {
+  if (!markdown?.trim()) {
     return { title: '', content: '' };
   }
 
   const lines = markdown.split('\n');
-  const firstLine = lines[0] || '';
+  const firstLine = lines[0] ?? '';
   
   // Extract title from first line (remove # and trim)
   const title = firstLine.replace(/^#\s*/, '').trim();

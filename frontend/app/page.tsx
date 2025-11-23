@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import MarkdownEditor from './components/MarkdownEditor';
 import { parseMarkdown } from './utils/markdown';
+import ThemeToggle from './components/ThemeToggle';
 
 interface Post {
   id: string;
@@ -123,20 +124,20 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="text-lg text-slate-600 font-medium">Loading posts...</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="text-lg text-slate-600 dark:text-slate-400 font-medium">Loading posts...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-base-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg border border-base-200 shadow-sm p-8 max-w-md">
-          <div className="text-base-900 text-lg font-medium mb-4">Error: {error}</div>
+      <div className="min-h-screen bg-base-50 dark:bg-base-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm p-8 max-w-md">
+          <div className="text-base-900 dark:text-base-100 text-lg font-medium mb-4">Error: {error}</div>
           <button 
             onClick={fetchPosts}
-            className="px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 transition-colors font-medium"
+            className="px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
           >
             Retry
           </button>
@@ -146,24 +147,25 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-base-50">
+    <div className="min-h-screen bg-base-50 dark:bg-base-900">
       {/* Header */}
-      <header className="bg-white border-b border-base-200">
+      <header className="bg-white dark:bg-base-800 border-b border-base-200 dark:border-base-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-base-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-base-900 dark:text-base-100 tracking-tight">
               Zlogg
             </h1>
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
+              <ThemeToggle />
               <button
                 onClick={fetchPosts}
-                className="px-4 py-2 text-sm border border-slate-300 text-slate-700 rounded-md hover:bg-slate-50 transition-colors font-medium"
+                className="px-4 py-2 text-sm border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-50 dark:hover:bg-base-700 transition-colors font-medium"
               >
                 Refresh
               </button>
               <button
                 onClick={() => setShowCreateForm(!showCreateForm)}
-                className="px-4 py-2 text-sm bg-accent-600 text-white rounded-md hover:bg-accent-700 transition-colors font-medium"
+                className="px-4 py-2 text-sm bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
               >
                 {showCreateForm ? 'Cancel' : '+ New Post'}
               </button>
@@ -175,10 +177,10 @@ export default function HomePage() {
       {/* Create Post Form */}
       {showCreateForm && (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <form onSubmit={handleCreatePost} className="bg-white rounded-lg border border-base-200 shadow-sm p-6 sm:p-8">
+          <form onSubmit={handleCreatePost} className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm p-6 sm:p-8">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-base-900 mb-2">Create New Post</h2>
-              <p className="text-sm text-slate-600">Start by typing your title after the # symbol, then press Enter to begin writing.</p>
+              <h2 className="text-xl font-semibold text-base-900 dark:text-base-100 mb-2">Create New Post</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Start by typing your title after the # symbol, then press Enter to begin writing.</p>
             </div>
             <div className="mb-6">
               <MarkdownEditor
@@ -191,7 +193,7 @@ export default function HomePage() {
               <button
                 type="submit"
                 disabled={creating}
-                className="px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 {creating ? 'Creating...' : 'Create Post'}
               </button>
@@ -202,7 +204,7 @@ export default function HomePage() {
                   setNewPostContent('# ');
                 }}
                 disabled={creating}
-                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                className="px-4 py-2 bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
               >
                 Cancel
               </button>
@@ -215,10 +217,10 @@ export default function HomePage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {posts.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-slate-600 text-lg mb-4">No posts yet</div>
+            <div className="text-slate-600 dark:text-slate-400 text-lg mb-4">No posts yet</div>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="px-4 py-2 bg-accent-600 text-white rounded-md hover:bg-accent-700 transition-colors font-medium"
+              className="px-4 py-2 bg-accent-600 dark:bg-accent-500 text-white rounded-md hover:bg-accent-700 dark:hover:bg-accent-600 transition-colors font-medium"
             >
               Create your first post
             </button>
@@ -228,18 +230,18 @@ export default function HomePage() {
             {posts.map((post) => (
               <article
                 key={post.id}
-                className="bg-white rounded-lg border border-base-200 shadow-sm hover:shadow-md transition-all overflow-hidden"
+                className="bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-sm hover:shadow-md transition-all overflow-hidden"
               >
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-base-900 mb-3 line-clamp-2">
+                  <h2 className="text-lg font-semibold text-base-900 dark:text-base-100 mb-3 line-clamp-2">
                     {post.title}
                   </h2>
-                  <div className="text-slate-600 mb-4 line-clamp-3 prose prose-sm max-w-none prose-slate">
+                  <div className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-3 prose prose-sm max-w-none prose-slate dark:prose-invert">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {post.content}
                     </ReactMarkdown>
                   </div>
-                  <div className="text-xs text-slate-500 mb-4 space-y-1">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mb-4 space-y-1">
                     <div>Created: {formatDate(post.created_at)}</div>
                     {post.last_modified !== post.created_at && (
                       <div>Modified: {formatDate(post.last_modified)}</div>
@@ -248,19 +250,19 @@ export default function HomePage() {
                   <div className="flex gap-2">
                     <Link
                       href={`/posts/${post.id}`}
-                      className="flex-1 text-center px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                      className="flex-1 text-center px-3 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
                     >
                       View
                     </Link>
                     <Link
                       href={`/posts/${post.id}/edit`}
-                      className="flex-1 text-center px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                      className="flex-1 text-center px-3 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
                     >
                       Edit
                     </Link>
                     <button
                       onClick={() => handleDeleteClick(post.id, post.title)}
-                      className="flex-1 px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors font-medium"
+                      className="flex-1 px-3 py-2 text-sm bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors font-medium"
                     >
                       Delete
                     </button>
@@ -275,33 +277,33 @@ export default function HomePage() {
       {/* Delete Confirmation Modal */}
       {deleteModal && (
         <Dialog open={!!deleteModal} onClose={handleDeleteCancel} className="relative z-50">
-          <div className="fixed inset-0 bg-base-900/50" aria-hidden="true" />
+          <div className="fixed inset-0 bg-base-900/50 dark:bg-base-950/50" aria-hidden="true" />
           <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-            <DialogPanel className="max-w-lg space-y-4 bg-white rounded-lg border border-base-200 shadow-lg p-6">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-50 rounded-full">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+            <DialogPanel className="max-w-lg space-y-4 bg-white dark:bg-base-800 rounded-lg border border-base-200 dark:border-base-700 shadow-lg p-6">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-50 dark:bg-red-900/20 rounded-full">
+                <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
               </div>
               
-              <DialogTitle className="text-lg font-semibold text-base-900 text-center">
+              <DialogTitle className="text-lg font-semibold text-base-900 dark:text-base-100 text-center">
                 Delete Post
               </DialogTitle>
               
-              <p className="text-slate-600 text-center text-sm">
-                Are you sure you want to delete <span className="font-medium text-base-900">"{deleteModal.title}"</span>? This action cannot be undone.
+              <p className="text-slate-600 dark:text-slate-400 text-center text-sm">
+                Are you sure you want to delete <span className="font-medium text-base-900 dark:text-base-100">"{deleteModal.title}"</span>? This action cannot be undone.
               </p>
               
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleDeleteCancel}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
+                  className="flex-1 px-4 py-2 bg-slate-100 dark:bg-base-700 text-slate-700 dark:text-slate-300 rounded-md hover:bg-slate-200 dark:hover:bg-base-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteConfirm}
                   disabled={deleting}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-red-600 dark:bg-red-500 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm flex items-center justify-center gap-2"
                 >
                   {deleting ? (
                     <>
