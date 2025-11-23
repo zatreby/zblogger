@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { useKeyboardShortcut } from './hooks/useKeyboardShortcut';
 import { toast } from 'sonner';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import MarkdownEditor from './components/MarkdownEditor';
@@ -113,6 +114,13 @@ export default function HomePage() {
   const handleDeleteCancel = () => {
     setDeleteModal(null);
   };
+
+  // Keyboard shortcut: Esc to close delete modal
+  useKeyboardShortcut({
+    key: 'Escape',
+    callback: handleDeleteCancel,
+    enabled: !!deleteModal,
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

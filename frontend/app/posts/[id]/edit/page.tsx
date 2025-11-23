@@ -9,6 +9,8 @@ import MarkdownEditor from '../../../components/MarkdownEditor';
 import { parseMarkdown, combineToMarkdown } from '../../../utils/markdown';
 import ThemeToggle from '../../../components/ThemeToggle';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
+import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 interface Post {
   id: string;
@@ -56,8 +58,8 @@ export default function EditPostPage() {
     }
   };
 
-  const handleUpdatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdatePost = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     
     if (!post) return;
     
@@ -88,6 +90,15 @@ export default function EditPostPage() {
       setUpdating(false);
     }
   };
+
+  // Keyboard shortcut: Ctrl+S / Cmd+S to save
+  useKeyboardShortcut({
+    key: 's',
+    ctrl: true,
+    meta: true,
+    callback: handleUpdatePost,
+    enabled: !updating && !!post,
+  });
 
   if (loading) {
     return <LoadingSpinner fullScreen text="Loading post..." />;

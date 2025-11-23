@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { AlertTriangle, Loader2, ArrowLeft } from 'lucide-react';
 import ThemeToggle from '../../components/ThemeToggle';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 interface Post {
   id: string;
@@ -81,6 +82,13 @@ export default function PostPage() {
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
   };
+
+  // Keyboard shortcut: Esc to close delete modal
+  useKeyboardShortcut({
+    key: 'Escape',
+    callback: handleDeleteCancel,
+    enabled: showDeleteModal,
+  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
