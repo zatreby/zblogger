@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { toast } from 'sonner';
 import MarkdownEditor from '../../../components/MarkdownEditor';
 import { parseMarkdown, combineToMarkdown } from '../../../utils/markdown';
 import ThemeToggle from '../../../components/ThemeToggle';
@@ -62,7 +63,7 @@ export default function EditPostPage() {
     const { title, content } = parseMarkdown(editedPostContent);
     
     if (!title.trim()) {
-      alert('Please enter a title for your post');
+      toast.error('Please enter a title for your post');
       return;
     }
 
@@ -78,9 +79,10 @@ export default function EditPostPage() {
 
       if (!response.ok) throw new Error('Failed to update post');
       
+      toast.success('Post updated successfully');
       router.push(`/posts/${post.id}`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to update post');
+      toast.error(err instanceof Error ? err.message : 'Failed to update post');
     } finally {
       setUpdating(false);
     }
