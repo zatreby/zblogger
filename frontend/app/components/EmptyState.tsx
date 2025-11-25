@@ -11,7 +11,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({
   title = 'No posts yet',
-  description = 'Get started by creating your first post',
+  description = 'The owner hasn\'t posted anything yet',
   actionLabel = 'Create your first post',
   onAction,
 }: EmptyStateProps) {
