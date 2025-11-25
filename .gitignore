@@ -16,6 +16,7 @@ yarn.lock
 /backend/*.log
 /backend/cache/
 /backend/tmp/
+/backend/.env
 
 # DevOps and temporary files
 .pids
