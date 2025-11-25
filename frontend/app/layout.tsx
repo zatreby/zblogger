@@ -1,5 +1,4 @@
 import './globals.css';
-import { Toaster } from 'sonner';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 export const metadata = {
@@ -17,7 +16,6 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           {children}
-          <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>
     </html>

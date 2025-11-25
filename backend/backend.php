@@ -1,5 +1,5 @@
 <?php
-// PHP Headless CMS Backend API
+// PHP Headless CMS Backend API with Admin Authentication
 // Simple RESTful API for blog posts with SQLite database
 
 // Enable error reporting for development
@@ -18,8 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Database configuration
+// Configuration
 define('DB_FILE', __DIR__ . '/blog.db');
+define('ADMIN_PASSWORD', getenv('ADMIN_PASSWORD')); // CHANGE THIS!
+define('TOKEN_EXPIRY_HOURS', 24);
 
 // Initialize database connection
 function getDB() {
@@ -38,6 +40,18 @@ function getDB() {
             )
         ");
         
+        // Create admin_tokens table for authentication
+        $db->exec("
+            CREATE TABLE IF NOT EXISTS admin_tokens (
+                token TEXT PRIMARY KEY,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME NOT NULL
+            )
+        ");
+        
+        // Clean up expired tokens
+        $db->exec("DELETE FROM admin_tokens WHERE expires_at < datetime('now')");
+        
         return $db;
     } catch (PDOException $e) {
         http_response_code(500);
@@ -46,12 +60,61 @@ function getDB() {
     }
 }
 
+// Generate secure random token
+function generateToken() {
+    return bin2hex(random_bytes(32));
+}
+
 // Generate UUID v4
 function generateUUID() {
     $data = random_bytes(16);
     $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
     $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+}
+
+// Verify admin token from Authorization header
+function verifyAdminToken($db) {
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+    
+    if (!$authHeader) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Authorization header required']);
+        exit();
+    }
+    
+    // Extract token from "Bearer <token>"
+    $parts = explode(' ', $authHeader);
+    if (count($parts) !== 2 || strtolower($parts[0]) !== 'bearer') {
+        http_response_code(401);
+        echo json_encode(['error' => 'Invalid authorization header format']);
+        exit();
+    }
+    
+    $token = $parts[1];
+    
+    try {
+        // Check if token exists and is not expired
+        $stmt = $db->prepare("
+            SELECT * FROM admin_tokens 
+            WHERE token = :token AND expires_at > datetime('now')
+        ");
+        $stmt->execute(['token' => $token]);
+        $tokenData = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$tokenData) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Invalid or expired token']);
+            exit();
+        }
+        
+        return $token;
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Token verification failed: ' . $e->getMessage()]);
+        exit();
+    }
 }
 
 // Parse request URI
@@ -67,7 +130,8 @@ function parseRequest() {
     return [
         'method' => $method,
         'resource' => $segments[0] ?? '',
-        'id' => $segments[1] ?? null
+        'subresource' => $segments[1] ?? null,
+        'id' => $segments[2] ?? $segments[1] ?? null
     ];
 }
 
@@ -97,9 +161,83 @@ function validatePostData($data, $isUpdate = false) {
     return $errors;
 }
 
-// API Endpoints
+// Authentication Endpoints
 
-// GET all posts
+// POST /api/admin/login
+function adminLogin($db) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (empty($input['password'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Password is required']);
+        return;
+    }
+    
+    // Verify password
+    if ($input['password'] !== ADMIN_PASSWORD) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Invalid password']);
+        return;
+    }
+    
+    try {
+        // Generate token
+        $token = generateToken();
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+' . TOKEN_EXPIRY_HOURS . ' hours'));
+        
+        // Store token
+        $stmt = $db->prepare("
+            INSERT INTO admin_tokens (token, expires_at) 
+            VALUES (:token, :expires_at)
+        ");
+        $stmt->execute([
+            'token' => $token,
+            'expires_at' => $expiresAt
+        ]);
+        
+        echo json_encode([
+            'success' => true,
+            'token' => $token,
+            'expires_at' => $expiresAt
+        ]);
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to create session: ' . $e->getMessage()]);
+    }
+}
+
+// GET /api/admin/verify
+function adminVerify($db) {
+    $token = verifyAdminToken($db);
+    
+    echo json_encode([
+        'success' => true,
+        'status' => 'valid',
+        'message' => 'Token is valid'
+    ]);
+}
+
+// POST /api/admin/logout
+function adminLogout($db) {
+    $token = verifyAdminToken($db);
+    
+    try {
+        $stmt = $db->prepare("DELETE FROM admin_tokens WHERE token = :token");
+        $stmt->execute(['token' => $token]);
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Logged out successfully'
+        ]);
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Logout failed: ' . $e->getMessage()]);
+    }
+}
+
+// Post Endpoints
+
+// GET all posts (public)
 function getAllPosts($db) {
     try {
         $stmt = $db->query("SELECT * FROM posts ORDER BY created_at DESC");
@@ -116,7 +254,7 @@ function getAllPosts($db) {
     }
 }
 
-// GET post by ID
+// GET post by ID (public)
 function getPostById($db, $id) {
     if (!$id) {
         http_response_code(400);
@@ -144,8 +282,11 @@ function getPostById($db, $id) {
     }
 }
 
-// POST create new post
+// POST create new post (protected)
 function createPost($db) {
+    // Verify admin authentication
+    verifyAdminToken($db);
+    
     $input = json_decode(file_get_contents('php://input'), true);
     
     // Validate input
@@ -186,8 +327,11 @@ function createPost($db) {
     }
 }
 
-// PATCH update post
+// PATCH update post (protected)
 function updatePost($db, $id) {
+    // Verify admin authentication
+    verifyAdminToken($db);
+    
     if (!$id) {
         http_response_code(400);
         echo json_encode(['error' => 'Post ID is required']);
@@ -252,8 +396,11 @@ function updatePost($db, $id) {
     }
 }
 
-// DELETE post
+// DELETE post (protected)
 function deletePost($db, $id) {
+    // Verify admin authentication
+    verifyAdminToken($db);
+    
     if (!$id) {
         http_response_code(400);
         echo json_encode(['error' => 'Post ID is required']);
@@ -292,6 +439,44 @@ function route() {
     $db = getDB();
     $request = parseRequest();
     
+    // Admin authentication routes
+    if ($request['resource'] === 'admin') {
+        switch ($request['subresource']) {
+            case 'login':
+                if ($request['method'] === 'POST') {
+                    adminLogin($db);
+                } else {
+                    http_response_code(405);
+                    echo json_encode(['error' => 'Method not allowed']);
+                }
+                return;
+                
+            case 'verify':
+                if ($request['method'] === 'GET') {
+                    adminVerify($db);
+                } else {
+                    http_response_code(405);
+                    echo json_encode(['error' => 'Method not allowed']);
+                }
+                return;
+                
+            case 'logout':
+                if ($request['method'] === 'POST') {
+                    adminLogout($db);
+                } else {
+                    http_response_code(405);
+                    echo json_encode(['error' => 'Method not allowed']);
+                }
+                return;
+                
+            default:
+                http_response_code(404);
+                echo json_encode(['error' => 'Admin endpoint not found']);
+                return;
+        }
+    }
+    
+    // Posts routes
     if ($request['resource'] !== 'posts') {
         http_response_code(404);
         echo json_encode(['error' => 'Resource not found']);
