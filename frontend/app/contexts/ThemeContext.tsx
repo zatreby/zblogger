@@ -16,17 +16,6 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
   const [theme, setThemeState] = useState<Theme>('light');
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    // Check localStorage and system preference
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const initialTheme = savedTheme || systemTheme;
-    
-    setThemeState(initialTheme);
-    updateDocumentClass(initialTheme);
-  }, []);
-
   const updateDocumentClass = (newTheme: Theme) => {
     const root = document.documentElement;
     if (newTheme === 'dark') {
@@ -35,6 +24,19 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
       root.classList.remove('dark');
     }
   };
+
+  useEffect(() => {
+    // mark mounted first so we don't render children until we've set theme + document class
+    setMounted(true);
+
+    // Check localStorage and system preference
+    const savedTheme = (localStorage.getItem('theme') as Theme) || null;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const initialTheme = savedTheme || systemTheme;
+
+    setThemeState(initialTheme);
+    updateDocumentClass(initialTheme);
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -47,9 +49,10 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
     setTheme(newTheme);
   };
 
-  // Prevent flash of wrong theme
+  // IMPORTANT: do NOT render children until provider is ready.
+  // Returning children here would expose them to "no provider" during first render.
   if (!mounted) {
-    return <>{children}</>;
+    return null;
   }
 
   return (
@@ -66,4 +69,3 @@ export function useTheme() {
   }
   return context;
 }
-
